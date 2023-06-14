@@ -1,3 +1,10 @@
+/*
+Napisz program, który odwróci kolejność znaków w pliku tekstowym „znaki1.txt” za
+pomocą struktury stos wykorzystując funkcje zaimplementowane w zadaniu 9.1. Odwrócony
+tekst należy zapisać do pliku „wynik.txt”.
+*/
+
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
