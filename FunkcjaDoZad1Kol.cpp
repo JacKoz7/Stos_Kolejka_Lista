@@ -8,7 +8,7 @@ int func(kolejka *k)
         int obecna_wartosc = first(k);
         push(k_kopia, pop(k));
         
-        if (obecna_wartosc % 3 == 0)
+        if (obecna_wartosc % 2 != 0)
         {
             nieparzyste++;
         }
