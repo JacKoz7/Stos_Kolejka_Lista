@@ -1,0 +1,1566 @@
+-------------------------------Kolejki------------------------------------------
+
+
+#include <iostream>
+
+using namespace std;
+
+struct element{
+    int number;
+    element *next;
+};
+
+struct Queue{
+    element *head;
+    element *tail;
+};
+
+int isEmpty(Queue *q){
+    if (q->head == NULL){
+        return 1;
+    }
+    return 0;
+}
+
+void push(Queue *q, int value){
+    element *el = new element;
+    el->number = value;
+    el->next = NULL;
+
+    if(q->tail != NULL){
+        q->tail->next = el;
+    }
+    else{
+        q->head = el;
+    }
+
+    q->tail = el;
+}
+
+int pop(Queue *q){
+    element *temp = q->head;
+    int returnValue = temp->number;
+
+    q->head = q->head->next;
+
+    if(q->head == NULL){
+        q->tail = NULL;
+    }
+
+    delete temp;
+
+    return returnValue;
+}
+
+int top(Queue *q){
+    return q->head->number;
+}
+
+//Ile_nieparzystych
+int ile_nieparzystych(Queue *q){
+    Queue *Rob = new Queue;
+    Rob->head = NULL;
+    Rob->tail = NULL;
+
+    int licznik = 0;
+
+    while(!isEmpty(q)){
+        if(top(q) % 2 != 0){
+            licznik++;
+        }
+        int usunienty_q = pop(q);
+        push(Rob,usunienty_q);
+
+    }
+
+    while(!isEmpty(Rob)){
+        int usuniety_rob = pop(Rob);
+        push(q,usuniety_rob);
+    }
+
+    delete Rob;
+
+    return licznik;
+}
+
+//Minimalny element
+int Min_element(Queue *q){
+
+    Queue *Rob = new Queue;
+    Rob->head = NULL;
+    Rob->tail = NULL;
+
+    int minEl = top(q);
+
+    while(!isEmpty(q)){
+        int usunienty_q = pop(q);
+        if (usunienty_q < minEl){
+            minEl = usunienty_q;
+        }
+        push(Rob,usunienty_q);
+    }
+
+    while(!isEmpty(Rob)){
+        int usuniety_rob = pop(Rob);
+        push(q,usuniety_rob);
+    }
+
+    delete Rob;
+
+    return minEl;
+}
+
+//Tak jak powinno byc
+
+//Ile_nieparzystych
+int ile_nieparzystych(Queue *q){
+    Queue *Rob = new Queue;
+    Rob->head = NULL;
+    Rob->tail = NULL;
+
+    int licznik = 0;
+
+    while(!isEmpty(q)){
+        if(top(q) % 2 != 0){
+            licznik++;
+        }
+
+        push(Rob,pop(q));
+
+    }
+
+    while(!isEmpty(Rob)){
+
+        push(q,pop(Rob));
+    }
+
+    delete Rob;
+
+    return licznik;
+}
+
+//Minimalny element
+int Min_element(Queue *q){
+
+    Queue *Rob = new Queue;
+    Rob->head = NULL;
+    Rob->tail = NULL;
+
+    int minEl = top(q);
+
+    while(!isEmpty(q)){
+
+        if (top(q) < minEl){
+            minEl = top(q);
+        }
+
+        push(Rob,pop(q));
+    }
+
+    while(!isEmpty(Rob)){
+        push(q,pop(Rob));
+    }
+
+    delete Rob;
+
+    return minEl;
+}
+
+//Srednia
+float srednia(Queue *q){
+    Queue *Rob = new Queue;
+    Rob->head = NULL;
+    Rob->tail = NULL;
+
+    float suma = 0;
+    int licznik = 0;
+
+    while(!isEmpty(q)){
+
+        suma += top(q);
+        licznik++;
+
+        push(Rob,pop(q));
+
+    }
+
+    while(!isEmpty(Rob)){
+
+        push(q,pop(Rob));
+    }
+
+    delete Rob;
+
+    if(licznik != 0){
+        return suma/licznik;
+    }
+    else return 0;
+}
+
+int main()
+{
+    Queue *q = new Queue; // !!!!
+    q->head = NULL;
+    q->tail = NULL;
+
+    cout << isEmpty(q) << endl;
+
+    push(q,5);
+    push(q,7);
+
+    cout << isEmpty(q) << endl;
+
+    cout << top(q) << endl;
+
+    push(q,-1);
+    push(q,8);
+
+
+    cout << "Ilosc nieparzystych elementow: " << ile_nieparzystych(q) << endl;
+    cout << "Minimalny element: " << Min_element(q) << endl;
+
+    delete q; // !!!!
+
+    return 0;
+}
+
+
+----------------------------Lista DKC-----------------------------------------
+
+#include <iostream>
+
+using namespace std;
+
+struct element{
+    int number;
+    element* next;
+    element* prev;
+};
+
+struct DwuKierunkowaCykliczna{
+    element* biezacy;
+};
+
+bool isEmpty_lista_DKC(DwuKierunkowaCykliczna l){
+    if (l.biezacy == NULL)
+        return true;
+    return false;
+}
+
+int ileEl_DKC(DwuKierunkowaCykliczna &l){
+    int e = 0;
+    if(isEmpty_lista_DKC(l))
+        return e;
+    element *p = l.biezacy;
+    do{
+        e++;
+        p = p->next;
+    }while(p!=l.biezacy);
+    return e;
+}
+
+
+
+
+void add_tail_DKC(DwuKierunkowaCykliczna&l, int value){
+    element *End, *el = new element;
+    if(l.biezacy == NULL){
+        el->number = value;
+        el->next   = el;
+        el->prev   = el->next;
+        l.biezacy  = el;
+        return;
+    }
+    End = l.biezacy;
+
+    el->next   = End->next;
+    el->number = value;
+    el->prev   = End;
+    End->next  = el;
+    End = el;
+    End->next->prev = End;
+}
+
+void add_head_DKC(DwuKierunkowaCykliczna &l, int value){
+    element *el = new element;
+    if(l.biezacy == NULL){
+        el->number = value;
+        el->next   = el;
+        el->prev   = el->next;
+        l.biezacy  = el;
+        return;
+    }
+    element* prev =l.biezacy->prev;
+    el->number=value;
+    el->prev=prev;
+    el->next=l.biezacy;
+    prev->next=el;
+    l.biezacy->prev=el;
+}
+
+void delete_za_DKC(DwuKierunkowaCykliczna &l){
+    element *el  = l.biezacy->next;
+    l.biezacy->next = el->next;
+    l.biezacy->next->prev = el->prev;
+    if( el->next == el )
+        l.biezacy = NULL;
+    delete el;
+}
+
+void delete_przed_DKC(DwuKierunkowaCykliczna&l){
+    element *pom, *el, *End;
+    End = l.biezacy->prev->prev;
+    el = End->next;
+    pom = el;
+    if (el->next == el){
+        pom = l.biezacy->next;
+        l.biezacy = NULL;
+    }
+    else{
+        //l.biezacy = el->next;
+        End->next = l.biezacy;
+        l.biezacy->prev = el->prev;
+    }
+    delete pom;
+
+}
+
+void delete_biezacy_DKC(DwuKierunkowaCykliczna &l){
+    element *pom, *el, *End;
+    el = l.biezacy;
+    End = l.biezacy->prev;
+    pom = el;
+    if (el->next == el){
+        pom = l.biezacy->next;
+        l.biezacy = NULL;
+    }
+    else{
+        l.biezacy = el->next;
+        l.biezacy->prev = el->prev;
+        End->next = l.biezacy;
+    }
+    delete pom;
+}
+
+void show_DKC(DwuKierunkowaCykliczna l, short tryb){
+    element *temp = l.biezacy;
+    cout << "Lista dwukierunkowa\n";
+
+    do{
+        cout << temp->number << " ";
+
+        if (tryb == 0)
+            temp=temp->next;
+        else
+            temp=temp->prev;
+
+    }while(temp!=l.biezacy);
+
+    cout << endl;
+}
+
+//Ile ujemnych
+int ile_ujemnych(DwuKierunkowaCykliczna *l){
+    element *temp = l->biezacy;
+
+    int licznik = 0;
+
+    if(l->biezacy == NULL){ //isEmpty_lista_JKC(l)
+        return licznik;
+    }
+
+    do{
+        if(temp->number < 0){
+            licznik++;
+        }
+
+        temp=temp->next; //temp = temp->prev
+
+    }while(temp != l->biezacy);
+
+    return licznik;
+
+}
+
+//Min element
+int Min(DwuKierunkowaCykliczna *l){
+
+    if(l->biezacy == NULL){ //isEmpty_lista_JKC(l) ????
+        return 0;
+    }
+
+    int Min = l->biezacy->number;
+
+    element *temp = l->biezacy->prev; //Od konca listy !!! //temp = temp->next
+
+    do{
+        if(temp->number < Min){
+            Min = temp->number;
+        }
+
+        temp=temp->prev; //temp = temp->next
+
+    }while(temp != l->biezacy);
+
+    return Min;
+}
+
+
+//Funkcja zwracająca sumę jako return, a ile przez parametr z referencja !!! Obowiązkowo może być !!!
+int suma_parzystcyh(DwuKierunkowaCykliczna *l, int &ile){
+
+    element *temp = l->biezacy;
+    int suma = 0;
+    ile = 0;
+
+    if(l->biezacy == NULL){
+        return suma;
+    }
+
+    do{
+        if(temp->number %2 == 0){
+            suma += temp->number;
+            ile++;
+        }
+
+        temp = temp->next; //temp = temp->prev
+
+    }while(temp != l->biezacy);
+
+    return suma;
+}
+
+
+int main()
+{
+    DwuKierunkowaCykliczna l;  // DwuKierunkowaCykliczna *l = new DwuKierunkowaCykliczna;
+    l.biezacy = NULL; //l->biezacy = NULL;
+
+    cout << isEmpty_lista_DKC(l) << endl;
+
+    add_tail_DKC(l,5);
+
+    show_DKC(l,0);
+
+    add_head_DKC(l,7);
+    add_head_DKC(l,14);
+    add_tail_DKC(l,-30);
+    add_tail_DKC(l,-3);
+    add_head_DKC(l,18);
+    add_tail_DKC(l,33);
+
+    show_DKC(l,0);
+    show_DKC(l,1);
+
+    delete_za_DKC(l);
+    delete_przed_DKC(l);
+
+    show_DKC(l,0);
+
+    /*element* newElement = new element;
+    newElement->number = 3;
+    newElement->next = newElement; // Wskaźnik na sam siebie, ponieważ jest to jedyny element
+    l.biezacy = newElement;
+
+    newElement = new element;
+    newElement->number = 7;
+    newElement->next = l.biezacy->next; // Wskaźnik na początek listy
+    l.biezacy->next = newElement; // Aktualizacja wskaźnika bieżącego elementu
+
+    newElement = new element;
+    newElement->number = 5;
+    newElement->next = l.biezacy->next;
+    l.biezacy->next = newElement;
+
+    newElement = new element;
+    newElement->number = 9;
+    newElement->next = l.biezacy->next;
+    l.biezacy->next = newElement;
+
+    show_JKC(l); */
+
+    cout << "Ilosc ujemnych elementow: " << ile_ujemnych(&l) << endl;
+    cout << "Min element: " << Min(&l) << endl;
+
+    int ile;
+    cout << "Suma parzystych: " << suma_parzystcyh(&l,ile) <<  " " << ile << endl;
+
+    //delete l;
+
+    return 0;
+}
+
+
+----------------------------Lista DK----------------------------------------------
+
+
+#include <iostream>
+
+using namespace std;
+
+struct element{
+    int number;
+    element *next;
+    element *prev;
+};
+
+struct double_list{
+    element *head;
+    element *tail;
+    int counter;
+};
+
+bool isEmpty(double_list *l){
+    return(l->head == NULL && l->tail == NULL);
+}
+
+void add_tail(double_list *l, int value){
+    element *el = new element;
+    el->number = value;
+    el->next = NULL;
+    el->prev = NULL;
+
+    if(l->tail != NULL){
+        l->tail->next = el;
+        el->prev = l->tail; // !!!!!!!
+    }
+    else{
+        l->head = el;
+    }
+
+    l->tail = el;
+
+    l->counter++;
+}
+
+void add_head(double_list *l, int value){
+    element *el = new element;
+    el->number = value;
+    el->next = NULL;
+    el->prev = NULL;
+                            // !!!!!!!!!!!!!!!
+    if(l->head != NULL){
+        l->head->prev = el;
+        el->next = l->head;
+    }
+    else{
+        l->tail = el;
+    }
+
+    l->head = el;
+
+    l->counter++;
+}
+
+void add_position(double_list *l, int value, int position){
+    element *temp = l->head;
+
+    int i = 1;
+    while(i < position - 1){
+        temp = temp->next;
+        i++;
+    }
+
+    element *el = new element;
+    el->number = value;
+    el->prev = temp;  // !!!!!
+    el->next = temp->next;
+
+    temp->next->prev = el;
+    temp->next = el;
+
+    l->counter++;
+
+}
+
+void delete_tail(double_list *l){
+    element *temp = l->tail;
+
+    if(l->counter == 1){
+        l->head == NULL;
+        l->tail == NULL;
+    }
+    else{
+        l->tail = l->tail->prev;
+        l->tail->next = NULL;
+    }
+    delete temp;
+    l->counter--;
+}
+
+void delete_head(double_list *l){
+    element *temp = l->head;
+
+    if(l->counter == 1){
+        l->tail = NULL;
+        l->head = NULL;
+    }
+    else{
+        l->head = l->head->next;
+        l->head->prev = NULL;
+    }
+
+    delete temp;
+    l->counter--;
+}
+
+void delete_position(double_list *l, int position){
+    element *temp = l->head;
+
+    int i = 1;
+    while(i < position - 1){
+        temp = temp->next;
+        i++;
+    }
+
+    element *temp_us = temp->next;
+    temp->next = temp_us->next;
+    temp->next->prev = temp;
+
+    delete temp_us;
+
+    l->counter--;
+
+}
+
+void wyswietl(double_list *l){
+    element *r;
+
+    if(isEmpty(l)){ //l->head == NULL ?
+        cout << "Lista jest pusta!!!" << endl;
+    }
+    else{
+        r = l->head; // r = l->tail; // W innym kierunku
+        while(r!= NULL){
+            cout << r->number << " ";
+            r = r->next; // r = r->prev;
+        }
+    }
+    cout << endl;
+}
+
+// Jak na wykładzie
+
+//Ile_dodatnich
+int ile_dodatnich(double_list *l){
+    element *r;
+    int licznik = 0;
+
+    if(isEmpty(l)){ //l->head == NULL ?
+        cout << "Lista jest pusta!!!" << endl;
+        return 0;
+    }
+    else{
+        r = l->head; // r = l->tail; // W innym kierunku
+        while(r!= NULL){
+            if(r->number > 0)
+                licznik++;
+            r = r->next; // r = r->prev;
+        }
+    }
+    return licznik;
+}
+
+//Min element
+int Min(double_list *l){
+    element *r;
+
+
+    if(isEmpty(l)){ //l->head == NULL ?
+        cout << "Lista jest pusta!!!" << endl;
+        return 0;
+    }
+    else{
+        r = l->head; // r = l->tail; // W innym kierunku
+
+        int Min = r->number;
+
+        while(r!= NULL){
+            if(r->number < Min)
+                Min = r->number;
+            r = r->next; // r = r->prev;
+        }
+
+        return Min;
+    }
+}
+
+//Jak na laboratorium (z Counter !!!)
+
+//Ile ujemnych
+int ile_ujemnych(double_list *l){
+    element *temp = l->head; // temp = l->tail; // W innym kierunku
+
+    int i = 1;
+    int licznik = 0;
+
+    while(i <= l->counter){
+
+        if(temp->number < 0){
+            licznik++;
+        }
+
+    temp = temp->next; // temp = temp->prev;
+
+    i++;
+    }
+    //delete temp;
+    return licznik;
+}
+
+//Max element
+int Max(double_list *l){
+    element *temp = l->tail; //temp = l->head;
+
+    int i = 1;
+
+    int Max = temp->number;
+
+    while(i <= l->counter){
+        if(Max < temp->number){
+            Max = temp->number;
+        }
+
+        temp = temp->prev; //temp = temp->next
+        i++;
+    }
+
+    //delete temp;
+
+    return Max;
+}
+
+
+int main()
+{
+    double_list *l = new double_list;
+    l->head = NULL;
+    l->tail = NULL;
+    l->counter = 0;
+
+    cout << isEmpty(l) << endl;
+
+    add_tail(l,10);
+    add_head(l,33);
+    add_tail(l,-7);
+    add_head(l,22);
+    add_position(l,-9,3);
+
+    cout << "Ilosc elementow: " << l->counter << endl;
+
+    wyswietl(l);
+
+    /*delete_head(l);
+    delete_position(l,3);
+    delete_tail(l); */
+
+
+    cout << "Ilosc dodatnich elementow: " << ile_dodatnich(l) << endl;
+    cout << "Minimalny el: " << Min(l) << endl;
+
+    cout << "Ilosc ujemnych elementow: " << ile_ujemnych(l) << endl;
+    cout << "Maksymalny el: " << Max(l) << endl;
+
+    delete l;
+
+
+    return 0;
+}
+
+
+--------------------------------------Lista JKC -------------------------------------------------
+
+
+#include <iostream>
+
+using namespace std;
+
+struct element{
+    int number;
+    element* next;
+};
+
+//JednoKierunkowa Cykliczna
+struct JednoKierunkowaCykliczna{
+    element* biezacy;
+};
+
+bool isEmpty_lista_JKC(JednoKierunkowaCykliczna l){
+    if (l.biezacy == NULL)
+        return true;
+    return false;
+}
+
+
+int ileEl_JKC(JednoKierunkowaCykliczna&l){
+    int e = 0;
+    if(isEmpty_lista_JKC(l))
+        return e;
+    element *p = l.biezacy;
+    do{
+        e++;
+        p = p->next;
+    }while(p!=l.biezacy);
+    return e;
+
+}
+
+void add_tail_JKC(JednoKierunkowaCykliczna&l, int value){
+    element *el = new element, *pom;
+    if(l.biezacy == NULL){
+        el->number  = value;
+        el->next    = el;
+        l.biezacy   = el;
+        return;
+    }
+    el = l.biezacy;
+    pom = new element;
+    pom->next   = el->next;
+    pom->number = value;
+    el->next = pom;
+}
+
+void add_head_JKC(JednoKierunkowaCykliczna&l, int value){
+    element *el = new element;
+    el->number  = value;
+
+    if(l.biezacy != NULL){
+        el->next = l.biezacy->next;
+        l.biezacy->next = el;
+    }
+    else{
+        element *prev = l.biezacy;
+        do{
+            prev = prev->next;
+        }while(prev->next!=l.biezacy);
+        el->next = l.biezacy;
+        prev->next = el;
+    }
+
+}
+
+void delete_przed_JKC(JednoKierunkowaCykliczna&l){
+    element *pom, *el, *End;
+    End = l.biezacy, el = l.biezacy->next;
+    while(true){
+        if (el->next != l.biezacy){
+            el=el->next;
+            End = End->next;
+        }
+        else
+            break;
+    }
+    el = End->next;
+    pom = el;
+    if (el->next == el){
+        pom = l.biezacy->next;
+        l.biezacy = NULL;
+    }
+    else{
+        //l.biezacy = el->next;
+        End->next = l.biezacy;
+    }
+    delete pom;
+}
+
+void delete_za_JKC(JednoKierunkowaCykliczna&l){
+    element *el  = l.biezacy->next;
+    l.biezacy->next = el->next;
+    if( el->next == el )
+        l.biezacy = NULL;
+    delete el;
+}
+
+void delete_biezacy_JKC(JednoKierunkowaCykliczna&l){
+    element *pom, *el, *End;
+    el = End = l.biezacy;
+    int i = 0;
+    while(true){
+        if (End->next != l.biezacy)
+            End=End->next;
+        else
+            break;
+        i++;
+    }
+    pom = el;
+    if (el->next == el){
+        pom = l.biezacy->next;
+        l.biezacy = NULL;
+    }
+    else{
+        l.biezacy = el->next;
+        End->next = l.biezacy;
+    }
+    delete pom;
+}
+
+void show_JKC(JednoKierunkowaCykliczna l){
+    element *temp = l.biezacy;
+
+    cout << "Lista jednokierunkowa\n";
+
+    do{
+        cout << temp->number << " ";
+
+        temp=temp->next;
+
+    }while(temp!=l.biezacy);
+
+    cout << endl;
+}
+
+//Ile dodatnich
+int ile_dodatnich(JednoKierunkowaCykliczna l){
+    element *temp = l.biezacy;
+
+    int licznik = 0;
+
+    if(l.biezacy == NULL){ //isEmpty_lista_JKC(l)
+        return licznik;
+    }
+
+    do{
+        if(temp->number > 0){
+            licznik++;
+        }
+
+        temp=temp->next;
+
+    }while(temp != l.biezacy);
+
+    return licznik;
+
+}
+
+//Maks element
+int Max(JednoKierunkowaCykliczna l){
+
+    if(l.biezacy == NULL){ //isEmpty_lista_JKC(l) ????
+        return 0;
+    }
+
+    int Max = l.biezacy->number;
+
+    element *temp = l.biezacy->next; // !!!!
+
+    do{
+        if(temp->number > Max){
+            Max = temp->number;
+        }
+
+        temp=temp->next;
+
+    }while(temp != l.biezacy);
+
+    return Max;
+}
+
+
+//Funkcja zwracająca sumę jako return, a ile przez parametr z referencja !!! Obowiązkowo może być !!!
+int suma_nieparzystcyh(JednoKierunkowaCykliczna l, int &ile){
+
+    element *temp = l.biezacy;
+    int suma = 0;
+    ile = 0;
+
+    if(l.biezacy == NULL){
+        return suma;
+    }
+
+    do{
+        if(temp->number %2 != 0){
+            suma += temp->number;
+            ile++;
+        }
+
+        temp = temp->next;
+
+    }while(temp != l.biezacy);
+
+    return suma;
+}
+
+
+//Nie dziala, ale na wszelki wypadek !!!
+void deleteOdd_JKC(JednoKierunkowaCykliczna& l) {
+    if (isEmpty_lista_JKC(l)) {
+        return;
+    }
+
+    element *current = l.biezacy;
+    element *prev = NULL;
+
+    // Znajdź poprzedni element
+    do {
+        prev = current;
+        current = current->next;
+    } while (current != l.biezacy);
+
+    current = l.biezacy;
+
+    do {
+        if (current->number % 2 != 0) {
+            if (current == l.biezacy) {
+                l.biezacy = current->next;
+            }
+            prev->next = current->next;
+            delete current;
+            current = prev->next;
+        } else {
+            prev = current;
+            current = current->next;
+        }
+    } while (current != l.biezacy);
+
+    // Jeśli wszystkie elementy były nieparzyste
+    if (l.biezacy->number % 2 != 0) {
+        delete l.biezacy;
+        l.biezacy = NULL;
+    }
+}
+
+int main()
+{
+    JednoKierunkowaCykliczna l;
+
+    l.biezacy = NULL;
+
+    /*cout << isEmpty_lista_JKC(l);
+
+    add_tail_JKC(l,5);
+
+    show_JKC(l);
+
+    add_head_JKC(l,7);
+    add_head_JKC(l,15);
+    add_tail_JKC(l,31);
+    add_tail_JKC(l,-3);
+    add_head_JKC(l,18);
+    add_tail_JKC(l,33);
+
+    show_JKC(l);
+
+    delete_za_JKC(l);
+    delete_przed_JKC(l); */
+
+    element* newElement = new element;
+    newElement->number = 3;
+    newElement->next = newElement; // Wskaźnik na sam siebie, ponieważ jest to jedyny element
+    l.biezacy = newElement;
+
+    newElement = new element;
+    newElement->number = 7;
+    newElement->next = l.biezacy->next; // Wskaźnik na początek listy
+    l.biezacy->next = newElement; // Aktualizacja wskaźnika bieżącego elementu
+
+    newElement = new element;
+    newElement->number = 5;
+    newElement->next = l.biezacy->next;
+    l.biezacy->next = newElement;
+
+    newElement = new element;
+    newElement->number = 9;
+    newElement->next = l.biezacy->next;
+    l.biezacy->next = newElement;
+
+    show_JKC(l);
+
+    cout << "Ilosc dodatnich elementow: " << ile_dodatnich(l) << endl;
+    cout << "Max element: " << Max(l) << endl;
+
+    int ile;
+    cout << "Suma nieparzystych: " << suma_nieparzystcyh(l,ile) <<  " " << ile << endl;
+
+    show_JKC(l);
+
+
+    return 0;
+}
+
+
+----------------------------------Lista JK---------------------------------------------
+
+
+#include <iostream>
+
+using namespace std;
+
+struct element{
+    int number;
+    element *next;
+};
+
+struct single_list{
+    element *head;
+    element *tail;
+    int counter;
+};
+
+bool isEmpty(single_list *l){
+    return(l->head == NULL && l->tail == NULL);
+}
+
+void add_tail(single_list *l, int value){
+    element *el = new element;
+    el->number = value;
+    el->next = NULL;
+
+    if(l->tail != NULL){
+        l->tail->next = el;
+    }
+    else{
+        l->head = el;
+    }
+    l->tail = el;
+
+    l->counter++;
+}
+
+void add_head(single_list *l, int value){
+    element *el = new element;
+    el->number = value;
+    el->next = l->head;
+
+    l->head = el;
+
+    if(l->tail == NULL){
+        l->tail = el;
+    }
+
+
+    l->counter++;
+}
+
+void add_pos(single_list *l, int value, int position){
+    element *el = new element;
+    el->number = value;
+    element *temp = l->head; // !!!!!!!!!!!!!!!
+
+    int i = 1;
+    while(i < position - 1){
+        temp = temp->next;
+        i++;
+    }
+
+    el->next = temp->next;
+    temp->next = el;
+
+    l->counter++;
+}
+
+void del_tail(single_list *l){
+    element *temp = l->tail;
+
+    if(l->counter == 1){
+        l->tail = NULL;   // !!!!!!!!!!!!
+        l->head = NULL;
+    }
+    else{
+        element *bef_temp = l->head;
+
+        int i = 1;
+        while(i < l->counter - 1){
+            bef_temp = bef_temp->next;
+            i++;
+        }
+
+        l->tail = bef_temp;
+        l->tail->next = NULL;
+    }
+    delete temp;
+    l->counter--;
+}
+
+void del_head(single_list *l){
+    element *temp = l->head;
+    l->head = l->head->next;
+
+    if(l->counter == 1){
+        l->tail = NULL;
+    }
+
+    delete temp;
+    l->counter--;
+}
+
+void del_pos(single_list *l, int position){
+    element *prev = l->head;
+
+    int i = 1;
+    while(i < position - 1){
+        prev = prev->next;
+        i++;
+    }
+    element *temp = prev->next;
+    prev->next = temp->next;
+    delete temp;
+
+    l->counter--;
+}
+
+void wyswietl(single_list *l){
+    element *r;
+
+    if(isEmpty(l)){ //l->head == NULL
+        cout << "Lista jest pusta !!!" << endl;
+    }
+    else{
+        r = l->head;
+        while(r != NULL){
+            cout << r->number << " ";
+            r = r->next;
+        }
+    }
+    cout << endl;
+}
+
+//Jak na wykładzie
+
+//Ile dodatnich
+int ile_dodatnich(single_list *l){
+    element *r;
+    int licznik = 0;
+
+    if(isEmpty(l)){ //l->head == NULL
+        cout << "Lista jest pusta !!!" << endl;
+        return 0;
+    }
+    else{
+        r = l->head;
+        while(r != NULL){
+            if(r->number > 0){
+                licznik++;
+            }
+            r = r->next;
+        }
+    }
+    return licznik;
+}
+
+//Maksymalny element
+int Max(single_list *l){
+    element *r;
+
+
+    if(l->head == NULL){ //l->head == NULL
+        cout << "Lista jest pusta !!!" << endl;
+        return 0;
+    }
+    else{
+        r = l->head;
+
+        int Max = r->number;
+
+        while(r != NULL){
+            if(r->number > Max){
+                Max = r->number;
+            }
+            r = r->next;
+        }
+        return Max;
+    }
+
+}
+
+//Jak na laboratorium (z Counter !!!)
+
+//Ile ujemnych
+int ile_ujemnych(single_list *l){
+    int i = 1;
+    int licznik = 0;
+
+    element *temp = l->head;
+
+    while(i <= l->counter){
+
+        if(temp->number < 0){
+            licznik -= -1;
+        }
+
+        temp = temp->next;
+        i++;
+    }
+
+    return licznik;
+}
+
+//Minimalny element
+int Min(single_list *l){
+    int i = 1;
+
+    element *temp = l->head;
+
+    int Min = temp->number;
+
+    while(i <= l->counter){
+
+        if(temp->number < Min){
+            Min = temp->number;
+        }
+
+        temp = temp->next;
+        i++;
+    }
+
+    return Min;
+}
+
+//Usun parzyste
+void usun_parzyste(single_list &l) {
+    element *prev = NULL;
+    element *curr = l.head;
+
+    while (curr != NULL) {
+        if (curr->number % 2 == 0) {
+            if (prev == NULL) {  // usuwamy głowę listy
+                l.head = curr->next;
+                if (l.head == NULL) {  // lista jest pusta
+                    l.tail = NULL;
+                }
+                delete curr;
+                curr = l.head;
+            } else {  // usuwamy element z środka listy
+                prev->next = curr->next;
+                if (curr->next == NULL) {  // usuwamy ostatni element listy
+                    l.tail = prev;
+                }
+                delete curr;
+                curr = prev->next;
+            }
+            l.counter--;
+        } else {
+            prev = curr;
+            curr = curr->next;
+        }
+    }
+}
+
+
+int main()
+{
+    single_list *l = new single_list;
+    l->head = NULL;
+    l->tail = NULL;
+    l->counter = 0;
+
+        cout << isEmpty(l) << endl;
+
+    add_head(l,-5);
+    add_tail(l,-20);
+    add_head(l,-4);
+    add_tail(l,-33);
+
+    add_pos(l,77,2);
+
+    cout << "Ilosc elementow: " << l->counter << endl;
+
+    wyswietl(l);
+
+    //del_tail(l);
+    //del_head(l);
+
+    //del_pos(l,2);
+
+    wyswietl(l);
+
+    cout << "Ilosc dodatnich: " << ile_dodatnich(l) << endl;
+
+    cout << "Maksymalny element: " << Max(l) << endl;
+
+    cout << "Ilosc ujemnych elementow: " << ile_ujemnych(l) << endl;
+    cout << "Minimalny element: " << Min(l) << endl;
+    cout << "Ilosc elementow: " << l->counter << endl;
+
+    delete l;
+
+    return 0;
+}
+
+
+---------------------------Stos----------------------------------------
+
+
+#include <iostream>
+
+using namespace std;
+
+struct element{
+    int number;
+    element *next;
+};
+
+bool isEmpty(element *Stack){
+    return(Stack == NULL);
+}
+
+void push(element *&Stack, int value){  //Dzialaja na oryginale
+    element *el = new element;
+    el->number = value;
+    el->next = Stack;
+    Stack = el;
+}
+
+int pop(element *&Stack){
+    element *temp = Stack;
+    int Value = temp->number;
+
+    Stack = Stack->next;
+    delete temp;
+
+    return Value;
+}
+
+int top(element *Stack){
+    return Stack->number;
+}
+
+void wyswietl(element *&Stack){
+    element *Rob = NULL;
+
+    while(!isEmpty(Stack)){
+        cout << top(Stack) << " ";
+
+        int usuniety_stack = pop(Stack);
+        push(Rob,usuniety_stack);
+    }
+
+    while(!isEmpty(Rob)){
+
+        int usuniety_rob = pop(Rob);
+        push(Stack,usuniety_rob);
+    }
+}
+
+//Ile parzystych
+int ile_parz(element *&Stack){
+    element *Rob = NULL;
+    int licznik = 0;
+
+    while(!isEmpty(Stack)){
+
+    if(top(Stack) % 2 == 0){
+        licznik++;
+    }
+        int usuniety_stack = pop(Stack);
+        push(Rob,usuniety_stack);
+    }
+
+    while(!isEmpty(Rob)){
+        int usuniety_rob = pop(Rob);
+        push(Stack,usuniety_rob);
+    }
+
+    return licznik;
+}
+
+//Ile parzystych 2
+int ile_parz(element *Stack){
+    element *Rob = NULL;
+    int licznik = 0;
+
+    while(!isEmpty(Stack)){
+
+    if(top(Stack) % 2 == 0){
+        licznik++;
+    }
+        push(Rob,pop(Stack));
+    }
+
+    while(!isEmpty(Rob)){
+        push(Stack,pop(Rob));
+    }
+
+    return licznik;
+}
+
+//Minimalny element
+int Min(element *&Stack){
+    element *Rob = NULL;
+
+    int Min = top(Stack);
+
+
+    while(!isEmpty(Stack)){
+
+    int usuniety_stack = pop(Stack);
+
+    if(usuniety_stack < Min){
+        Min = usuniety_stack;
+    }
+        push(Rob,usuniety_stack);
+    }
+
+    while(!isEmpty(Rob)){
+        int usuniety_rob = pop(Rob);
+        push(Stack,usuniety_rob);
+    }
+
+    return Min;
+}
+
+//Minimalny element 2
+int Min(element *Stack){
+
+    element* Rob = NULL;
+
+    int Min = top(Stack);
+
+    while(!isEmpty(Stack)){
+        if(top(Stack) < Min){
+            Min = top(Stack);
+        }
+        push(Rob, pop(Stack));
+    }
+
+    while(!isEmpty(Rob)){
+        push(Stack, pop(Rob));
+    }
+
+    return Min;
+}
+
+//Srednia
+float srednia(element *Stack){
+    element *Rob = NULL;
+    float suma = 0;
+    int licznik = 0;
+
+    while(!isEmpty(Stack)){
+
+        suma += top(Stack);
+        licznik++;
+        push(Rob,pop(Stack));
+    }
+
+    while(!isEmpty(Rob)){
+        push(Stack,pop(Rob));
+    }
+
+    if(licznik !=0 ){
+        return suma/licznik;
+    }
+    else return 0;
+}
+
+int main()
+{
+    element *Stack = NULL;
+
+    cout << isEmpty(Stack) << endl;
+
+    push(Stack,34);
+    push(Stack,5);
+    push(Stack,-5);
+    push(Stack,9);
+    push(Stack,10);
+    push(Stack,-3);
+    push(Stack,18);
+
+    cout << isEmpty(Stack) << endl;
+
+    wyswietl(Stack);
+    cout << "Liczba parzystych liczb: " << ile_parz(Stack) << endl;
+    cout << "Minimalny element: " << Min(Stack) << endl;
+
+    return 0;
+}
